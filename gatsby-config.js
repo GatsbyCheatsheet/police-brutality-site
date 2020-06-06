@@ -6,6 +6,7 @@ module.exports = {
     description: `Documenting evidence of police brutality during the 2020 George Floyd protests`,
     author: `Andrew Suzuki`,
     siteUrl: `https://blah`, // TODO
+    sourceUrl: `https://github.com/andrewsuzuki/police-brutality-site`,
   },
   plugins: [
     `gatsby-plugin-remove-trailing-slashes`,

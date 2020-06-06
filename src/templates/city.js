@@ -1,4 +1,5 @@
 import React from "react"
+import { graphql } from "gatsby"
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
@@ -27,7 +28,10 @@ export default CityTemplate
 
 export const query = graphql`
   query($state: String!, $city: String!) {
-    allPbIncident(filter: { state: { eq: $state }, city: { eq: $city } }) {
+    allPbIncident(
+      filter: { state: { eq: $state }, city: { eq: $city } }
+      sort: { fields: date, order: DESC }
+    ) {
       edges {
         node {
           id

@@ -11,6 +11,7 @@ const Layout = ({ children }) => {
       site {
         siteMetadata {
           title
+          sourceUrl
         }
       }
     }
@@ -27,7 +28,15 @@ const Layout = ({ children }) => {
         }}
       >
         <main>{children}</main>
-        <footer>© {new Date().getFullYear()}</footer>
+        <footer>
+          © {new Date().getFullYear()} &middot;{" "}
+          <a
+            href={data.site.siteMetadata.sourceUrl}
+            title="Source code on GitHub"
+          >
+            Source
+          </a>
+        </footer>
       </div>
     </>
   )

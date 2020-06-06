@@ -2,11 +2,19 @@
 
 ## TODO
 
+- Embeds
+  - Twitter
+  - Youtube
+  - Reddit
+  - Streamable
+  - Gfycat
+  - Imgur (+ gallery)
 - All incidents (ordered by most recent desc)
+  - Primitive Pagination
 - Incidents by state
 - Incidents by city
 - Individual incident page
-- Filter all by city, state, tag, etc
+- Quick jump select to city or state (from home page)
 - Updates after data is improved:
   - Use supplied id (once it is supplied)
   - Tags; tag pages

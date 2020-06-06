@@ -7,13 +7,23 @@ import SEO from "../components/seo"
 // TODO
 
 const IncidentTemplate = ({ data: { pbIncident } }) => {
-  const { name } = pbIncident
+  const { name, date, city, state } = pbIncident
   const title = `Incident: ${name}`
+
+  const dateString = new Date(date).toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  })
 
   return (
     <Layout>
       <SEO title={title} />
       <h2>{title}</h2>
+      <p>Date: {dateString}</p>
+      <p>
+        Location: {city}, {state}
+      </p>
       <p>TODO</p>
     </Layout>
   )
