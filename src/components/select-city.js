@@ -5,16 +5,16 @@ const SelectCity = _props => {
   const result = useStaticQuery(
     graphql`
       query {
-        allCity {
+        allState(sort: { fields: name, order: ASC }) {
           edges {
             node {
               id
-              name
               slug
-              parent {
-                ... on State {
-                  slug
-                }
+              name
+              childrenCity {
+                id
+                slug
+                name
               }
             }
           }
@@ -28,10 +28,19 @@ const SelectCity = _props => {
   /* eslint-disable jsx-a11y/no-onchange */
   return (
     <select onChange={onSelect}>
-      {result.allCity.edges.map(({ node: { id, name, slug, parent } }) => (
-        <option value={`/${parent.slug}/${slug}`} key={id}>
-          {name}
-        </option>
+      {result.allState.edges.map(({ node: state }) => (
+        <optgroup label={state.name} key={state.id}>
+          {state.childrenCity.length > 0 ? (
+            state.childrenCity.map(city => (
+              <option value={`/${state.slug}/${city.slug}`} key={city.id}>
+                {city.name}
+              </option>
+            ))
+          ) : (
+            // Handle Unknown Location (no cities)
+            <option value={`/${state.slug}`}>{state.name}</option>
+          )}
+        </optgroup>
       ))}
     </select>
   )

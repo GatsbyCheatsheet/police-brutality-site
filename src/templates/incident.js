@@ -15,7 +15,7 @@ const IncidentTemplate = ({ data: { pbIncident } }) => {
       <h2>{title}</h2>
       <p>Date: {formatDate(date)}</p>
       <p>
-        Location: {city}, {state}
+        Location: {city && city.name}, {state && state.name}
       </p>
     </Layout>
   )
@@ -30,9 +30,12 @@ export const query = graphql`
       name
       links
       date
-      date_text
-      city
-      state
+      city {
+        name
+      }
+      state {
+        name
+      }
       edit_at
     }
   }

@@ -20,24 +20,19 @@ const StateTemplate = ({ data: { state, allPbIncident } }) => {
 
 export default StateTemplate
 
-// TODO use ($stateId: String!) in allPbIncident
 export const query = graphql`
   query($stateId: String!) {
     state(id: { eq: $stateId }) {
       name
     }
-    allPbIncident(sort: { fields: date, order: DESC }) {
+    allPbIncident(
+      filter: { state: { id: { eq: $stateId } } }
+      sort: { fields: date, order: DESC }
+    ) {
       edges {
         node {
           id
           name
-          slug
-          links
-          date
-          date_text
-          city
-          state
-          edit_at
         }
       }
     }

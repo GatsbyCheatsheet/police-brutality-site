@@ -8,6 +8,60 @@ const _ = require(`lodash`)
 const path = require(`path`)
 const slugify = require(`@sindresorhus/slugify`)
 
+const expectedIncomingIncidentFields = [
+  "name",
+  "links",
+  "date",
+  "date_text", // removed
+  "city",
+  "state",
+  "edit_at",
+]
+
+// TODO can probably still use ___NODE convention, then "overwrite" them using @link (instead of _id fields)
+
+exports.createSchemaCustomization = function createSchemaCustomization({
+  actions,
+  schema,
+}) {
+  const { createTypes } = actions
+
+  createTypes([
+    schema.buildObjectType({
+      name: "State",
+      interfaces: ["Node"],
+      fields: {
+        name: "String!",
+        slug: "String!",
+        childrenCity: {
+          type: "[City!]!",
+          resolve: (source, _args, context, _info) => {
+            return context.nodeModel
+              .getAllNodes({ type: "City" })
+              .filter(city => city.state_id === source.id)
+          },
+        },
+      },
+    }),
+    `type City implements Node {
+      name: String!
+      slug: String!
+      state_id: String!
+      state: State! @link(by: "id", from: "state_id")
+    }`,
+    `type PbIncident implements Node {
+      name: String!
+      links: [String!]!
+      date: Date @dateformat(formatString: "YYYY-MM-DD")
+      edit_at: String
+      state_id: String
+      state: State @link(by: "id", from: "state_id")
+      city_id: String
+      city: City @link(by: "id", from: "city_id")
+    }`,
+  ])
+}
+
 // Source 2020PB json into PbIncident nodes
 exports.onCreateNode = async function onCreateNode({
   node,
@@ -15,6 +69,7 @@ exports.onCreateNode = async function onCreateNode({
   loadNodeContent,
   createNodeId,
   createContentDigest,
+  reporter,
 }) {
   const { createNode, createParentChildLink } = actions
 
@@ -36,15 +91,118 @@ exports.onCreateNode = async function onCreateNode({
 
     const { data } = parsedContent
 
-    if (_.isArray(data) && data[0] && data[0].links) {
-      data.forEach((incident, i) => {
+    if (_.isArray(data) && data[0] && _.isObject(data[0])) {
+      // Create State and City nodes
+      const cityStates = data.reduce((acc, { state, city }) => {
+        if (!state) {
+          return acc
+        }
+        if (!acc[state]) {
+          acc[state] = new Set()
+        }
+        if (city && city.length > 0) {
+          acc[state].add(city)
+        }
+        return acc
+      }, {})
+      const cityStateIds = {}
+      Object.entries(cityStates).forEach(([state, cities]) => {
+        if (state) {
+          // Create State node
+          const stateSlug = slugify(state)
+          const stateId = stateSlug
+          const stateObj = {
+            name: state,
+            slug: stateSlug,
+          }
+          const stateNode = {
+            ...stateObj,
+            id: stateId,
+            children: [],
+            parent: null,
+            internal: {
+              contentDigest: createContentDigest(stateObj),
+              type: `State`,
+            },
+          }
+          createNode(stateNode)
+
+          // Create City nodes for this State
+          // NOTE cities could be empty, e.g. for "Unknown Location" state
+          const cityIds = {}
+          cities.forEach(city => {
+            const citySlug = slugify(city)
+            const cityObj = {
+              name: city,
+              slug: citySlug,
+              state_id: stateId,
+            }
+            const cityNodeId = `${citySlug}-${stateSlug}`
+            cityIds[city] = cityNodeId
+
+            const cityNode = {
+              ...cityObj,
+              id: cityNodeId,
+              children: [],
+              parent: stateNode.id,
+              internal: {
+                contentDigest: createContentDigest(cityObj),
+                type: `City`,
+              },
+            }
+            createNode(cityNode)
+          })
+
+          cityStateIds[state] = {
+            stateId,
+            cityIds,
+          }
+        }
+      })
+
+      // Create Incident nodes
+      let warnedUnexpectedKeys = false
+      data.forEach((incomingIncident, i) => {
+        // Check for unexpected (possibly new) incoming keys
+        if (!warnedUnexpectedKeys) {
+          const diff = _.difference(
+            Object.keys(incomingIncident),
+            expectedIncomingIncidentFields
+          )
+          if (diff.length > 0) {
+            reporter.warn(
+              `Incoming incident had unexpected keys: ${diff.join(", ")}`
+            )
+            warnedUnexpectedKeys = true
+          }
+        }
+
+        const incident = _.pick(
+          incomingIncident,
+          _.without(expectedIncomingIncidentFields, "date_text")
+        )
+        const csi = incident.state && cityStateIds[incident.state]
+        incident.state_id = csi && csi.stateId
+        incident.city_id = csi && csi.cityIds[incident.city]
+        delete incident.state
+        delete incident.city
+
+        // Ensure has name
+        if (typeof incident.name !== "string" || incident.name.length === 0) {
+          reporter.warn("Incident missing string name")
+          return // continue
+        }
+
+        if (!incident.links) {
+          incident.links = []
+        }
+
         // TODO FUTURE use incoming incident id once available
-        const id = incident.id
-          ? String(incident.id)
-          : createNodeId(`${node.id} [${i}] >>> JSON`)
+        const id = createNodeId(`${node.id} [${i}] >>> JSON`)
 
         incident.slug = id
 
+        // Create Incident node
         const incidentNode = {
           ...incident,
           id,
@@ -56,70 +214,8 @@ exports.onCreateNode = async function onCreateNode({
           },
         }
         createNode(incidentNode)
+        // Link to parent File node
         createParentChildLink({ parent: node, child: incidentNode })
-      })
-
-      // TODO need to link City/State nodes to incident nodes
-
-      const cityStates = data.reduce((acc, { state, city }) => {
-        if (!state) {
-          return acc
-        }
-
-        if (!acc[state]) {
-          acc[state] = new Set()
-        }
-
-        if (city) {
-          acc[state].add(city)
-        }
-
-        return acc
-      }, {})
-
-      Object.entries(cityStates).forEach(([state, cities]) => {
-        if (state) {
-          const stateSlug = slugify(state)
-          const stateObj = {
-            name: state,
-            slug: stateSlug,
-          }
-
-          const stateNode = {
-            ...stateObj,
-            id: stateSlug,
-            children: [],
-            parent: null,
-            internal: {
-              contentDigest: createContentDigest(stateObj),
-              type: `State`,
-            },
-          }
-          createNode(stateNode)
-
-          cities.forEach(city => {
-            if (city) {
-              const citySlug = slugify(city)
-              const cityObj = {
-                name: city,
-                slug: citySlug,
-              }
-              const cityNodeId = `${citySlug}-${stateSlug}`
-              const cityNode = {
-                ...cityObj,
-                id: cityNodeId,
-                children: [],
-                parent: stateNode.id,
-                internal: {
-                  contentDigest: createContentDigest(cityObj),
-                  type: `City`,
-                },
-              }
-              createNode(cityNode)
-              createParentChildLink({ parent: stateNode, child: cityNode })
-            }
-          })
-        }
       })
     } else {
       throw new Error(`Bad 2020PB JSON`)
@@ -158,10 +254,8 @@ exports.createPages = async function createPages({ graphql, actions }) {
           node {
             id
             slug
-            parent {
-              ... on State {
-                slug
-              }
+            state {
+              slug
             }
           }
         }
@@ -176,34 +270,34 @@ exports.createPages = async function createPages({ graphql, actions }) {
   }
 
   // Create individual incident pages
-  results.data.allPbIncident.edges.forEach(({ node }) => {
+  results.data.allPbIncident.edges.forEach(({ node: { id, slug } }) => {
     createPage({
-      path: `/incident/${node.slug}`,
+      path: `/incident/${slug}`,
       component: incidentTemplate,
       context: {
-        incidentId: node.id, // use node id for now
+        incidentId: id,
       },
     })
   })
 
   // Create state pages
-  results.data.allState.edges.forEach(({ node }) => {
+  results.data.allState.edges.forEach(({ node: { id, slug } }) => {
     createPage({
-      path: `/${node.slug}`,
+      path: `/${slug}`,
       component: stateTemplate,
       context: {
-        stateId: node.id,
+        stateId: id,
       },
     })
   })
 
   // Create city pages
-  results.data.allCity.edges.forEach(({ node }) => {
+  results.data.allCity.edges.forEach(({ node: { id, slug, state } }) => {
     createPage({
-      path: `/${node.parent.slug}/${node.slug}`,
+      path: `/${state.slug}/${slug}`,
       component: cityTemplate,
       context: {
-        cityId: node.id,
+        cityId: id,
       },
     })
   })

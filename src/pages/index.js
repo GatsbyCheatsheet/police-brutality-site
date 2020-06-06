@@ -13,10 +13,10 @@ const IndexPage = ({ data: { allPbIncident } }) => (
       By city: <SelectCity />
       &nbsp;&nbsp; By state: <SelectState />
     </p>
-    {allPbIncident.edges.map(({ node }) => (
-      <li key={node.id}>
-        <Link to={`/incident/${node.slug}`} title={node.name}>
-          {node.name}
+    {allPbIncident.edges.map(({ node: { id, slug, name } }) => (
+      <li key={id}>
+        <Link to={`/incident/${slug}`} title={name}>
+          {name}
         </Link>
       </li>
     ))}
@@ -33,12 +33,6 @@ export const query = graphql`
           id
           name
           slug
-          links
-          date
-          date_text
-          city
-          state
-          edit_at
         }
       }
     }

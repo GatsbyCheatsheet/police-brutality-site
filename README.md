@@ -32,9 +32,8 @@ Converted into `PbIncident` GraphQL nodes.
 Fields:
 - id (internal)
 - name
-- links (array)
+- links ([String])
 - date
-- date_text
-- city
-- state
+- city (City)
+- state (State)
 - edit_at

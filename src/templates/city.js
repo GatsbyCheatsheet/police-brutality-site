@@ -5,7 +5,7 @@ import Layout from "../components/layout"
 import SEO from "../components/seo"
 
 const CityTemplate = ({ data: { city, allPbIncident } }) => {
-  const title = `Incidents in ${city.name}, ${city.parent.name}`
+  const title = `Incidents in ${city.name}, ${city.state.name}`
 
   return (
     <Layout>
@@ -22,29 +22,22 @@ const CityTemplate = ({ data: { city, allPbIncident } }) => {
 
 export default CityTemplate
 
-// TODO use cityId in allPbIncident
 export const query = graphql`
   query($cityId: String!) {
     city(id: { eq: $cityId }) {
       name
-      parent {
-        ... on State {
-          name
-        }
+      state {
+        name
       }
     }
-    allPbIncident(sort: { fields: date, order: DESC }) {
+    allPbIncident(
+      filter: { city: { id: { eq: $cityId } } }
+      sort: { fields: date, order: DESC }
+    ) {
       edges {
         node {
           id
           name
-          slug
-          links
-          date
-          date_text
-          city
-          state
-          edit_at
         }
       }
     }
