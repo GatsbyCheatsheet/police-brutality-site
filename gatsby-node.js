@@ -18,7 +18,7 @@ const expectedIncomingIncidentFields = [
   "edit_at",
 ]
 
-// TODO can probably still use ___NODE convention, then "overwrite" them using @link (instead of _id fields)
+const unknownLocationStateName = "Unknown Location"
 
 exports.createSchemaCustomization = function createSchemaCustomization({
   actions,
@@ -51,11 +51,12 @@ exports.createSchemaCustomization = function createSchemaCustomization({
     }`,
     `type PbIncident implements Node {
       name: String!
+      slug: String!
       links: [String!]!
       date: Date @dateformat(formatString: "YYYY-MM-DD")
       edit_at: String
-      state_id: String
-      state: State @link(by: "id", from: "state_id")
+      state_id: String!
+      state: State! @link(by: "id", from: "state_id")
       city_id: String
       city: City @link(by: "id", from: "city_id")
     }`,
@@ -93,18 +94,23 @@ exports.onCreateNode = async function onCreateNode({
 
     if (_.isArray(data) && data[0] && _.isObject(data[0])) {
       // Create State and City nodes
-      const cityStates = data.reduce((acc, { state, city }) => {
-        if (!state) {
+      const cityStates = data.reduce(
+        (acc, { state, city }) => {
+          if (!state) {
+            return acc
+          }
+          if (!acc[state]) {
+            acc[state] = new Set()
+          }
+          if (city && city.length > 0) {
+            acc[state].add(city)
+          }
           return acc
+        },
+        {
+          [unknownLocationStateName]: new Set(),
         }
-        if (!acc[state]) {
-          acc[state] = new Set()
-        }
-        if (city && city.length > 0) {
-          acc[state].add(city)
-        }
-        return acc
-      }, {})
+      )
       const cityStateIds = {}
       Object.entries(cityStates).forEach(([state, cities]) => {
         if (state) {
@@ -181,6 +187,7 @@ exports.onCreateNode = async function onCreateNode({
           incomingIncident,
           _.without(expectedIncomingIncidentFields, "date_text")
         )
+        incident.state = incident.state || unknownLocationStateName
         const csi = incident.state && cityStateIds[incident.state]
         incident.state_id = csi && csi.stateId
         incident.city_id = csi && csi.cityIds[incident.city]
@@ -197,8 +204,18 @@ exports.onCreateNode = async function onCreateNode({
           incident.links = []
         }
 
+        if (!incident.date) {
+          incident.date = null
+        }
+
+        if (!incident.edit_at) {
+          incident.edit_at = null
+        }
+
         // TODO FUTURE use incoming incident id once available
-        const id = createNodeId(`${node.id} [${i}] >>> JSON`)
+        const id = createNodeId(
+          `${incident.name}${incident.date}${incident.city}${incident.state}`
+        )
 
         incident.slug = id
 

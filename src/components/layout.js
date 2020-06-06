@@ -19,23 +19,31 @@ const Layout = ({ children }) => {
 
   return (
     <div className="site">
-      <Header siteTitle={data.site.siteMetadata.title} />
-      <div className="content">
-        <div className="wrapper">
-          <main className="main">{children}</main>
+      <section className="section">
+        <Header siteTitle={data.site.siteMetadata.title} />
+      </section>
+      <section className="section" style={{ flex: 1 }}>
+        <div className="content">
+          <div className="container">
+            <main className="main">{children}</main>
+          </div>
         </div>
-      </div>
-      <footer className="footer">
-        <div className="wrapper">
-          © {new Date().getFullYear()} &middot;{" "}
-          <a
-            href={data.site.siteMetadata.sourceUrl}
-            title="Source code on GitHub"
-          >
-            Source
-          </a>
-        </div>
-      </footer>
+      </section>
+      <section className="section">
+        <footer className="footer">
+          <div className="container">
+            <div className="has-text-centered">
+              © {new Date().getFullYear()} &middot;{" "}
+              <a
+                href={data.site.siteMetadata.sourceUrl}
+                title="Source code on GitHub"
+              >
+                Source
+              </a>
+            </div>
+          </div>
+        </footer>
+      </section>
     </div>
   )
 }

@@ -3,6 +3,7 @@ import { graphql } from "gatsby"
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
+import IncidentListing from "../components/incident-listing"
 
 const StateTemplate = ({ data: { state, allPbIncident } }) => {
   const title = `Incidents in ${state.name}`
@@ -12,7 +13,7 @@ const StateTemplate = ({ data: { state, allPbIncident } }) => {
       <SEO title={title} />
       <h2>{title}</h2>
       {allPbIncident.edges.map(({ node }) => (
-        <li key={node.id}>{node.name}</li>
+        <IncidentListing incident={node} key={node.id} />
       ))}
     </Layout>
   )
@@ -33,6 +34,20 @@ export const query = graphql`
         node {
           id
           name
+          slug
+          links
+          date
+          edit_at
+          state {
+            id
+            name
+            slug
+          }
+          city {
+            id
+            name
+            slug
+          }
         }
       }
     }

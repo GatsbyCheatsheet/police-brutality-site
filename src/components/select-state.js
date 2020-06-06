@@ -5,7 +5,7 @@ const SelectState = _props => {
   const result = useStaticQuery(
     graphql`
       query {
-        allState {
+        allState(sort: { fields: name, order: ASC }) {
           edges {
             node {
               id
@@ -18,17 +18,20 @@ const SelectState = _props => {
     `
   )
 
-  const onSelect = event => navigate(`/${event.target.value}`)
+  const onSelect = ({ target: { value } }) => value && navigate(`/${value}`)
 
   /* eslint-disable jsx-a11y/no-onchange */
   return (
-    <select onChange={onSelect}>
-      {result.allState.edges.map(({ node: { id, name, slug } }) => (
-        <option value={slug} key={id}>
-          {name}
-        </option>
-      ))}
-    </select>
+    <div className="select is-small">
+      <select onChange={onSelect}>
+        <option>&mdash;</option>
+        {result.allState.edges.map(({ node: { id, name, slug } }) => (
+          <option value={slug} key={id}>
+            {name}
+          </option>
+        ))}
+      </select>
+    </div>
   )
   /* eslint-enable jsx-a11y/no-onchange */
 }

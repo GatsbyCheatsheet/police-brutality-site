@@ -23,26 +23,29 @@ const SelectCity = _props => {
     `
   )
 
-  const onSelect = event => navigate(event.target.value)
+  const onSelect = ({ target: { value } }) => value && navigate(value)
 
   /* eslint-disable jsx-a11y/no-onchange */
   return (
-    <select onChange={onSelect}>
-      {result.allState.edges.map(({ node: state }) => (
-        <optgroup label={state.name} key={state.id}>
-          {state.childrenCity.length > 0 ? (
-            state.childrenCity.map(city => (
-              <option value={`/${state.slug}/${city.slug}`} key={city.id}>
-                {city.name}
-              </option>
-            ))
-          ) : (
-            // Handle Unknown Location (no cities)
-            <option value={`/${state.slug}`}>{state.name}</option>
-          )}
-        </optgroup>
-      ))}
-    </select>
+    <div className="select is-small">
+      <select onChange={onSelect}>
+        <option>&mdash;</option>
+        {result.allState.edges.map(({ node: state }) => (
+          <optgroup label={state.name} key={state.id}>
+            {state.childrenCity.length > 0 ? (
+              state.childrenCity.map(city => (
+                <option value={`/${state.slug}/${city.slug}`} key={city.id}>
+                  {city.name}
+                </option>
+              ))
+            ) : (
+              // Handle Unknown Location (no cities)
+              <option value={`/${state.slug}`}>{state.name}</option>
+            )}
+          </optgroup>
+        ))}
+      </select>
+    </div>
   )
   /* eslint-enable jsx-a11y/no-onchange */
 }

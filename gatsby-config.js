@@ -41,7 +41,7 @@ module.exports = {
     {
       resolve: `gatsby-plugin-sass`,
       options: {
-        includePaths: ["node_modules/systematize"],
+        includePaths: [],
       },
     },
     `gatsby-plugin-react-helmet`,

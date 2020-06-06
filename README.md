@@ -2,20 +2,10 @@
 
 ## TODO
 
-- link Incident to City and State
 - Embeds
-  - Twitter
-  - Youtube
-  - Reddit
-  - Streamable
-  - Gfycat
-  - Imgur (+ gallery)
 - All incidents (ordered by most recent desc)
   - Primitive Pagination
-- Incidents by state
-- Incidents by city
 - Individual incident page
-- Quick jump select to city or state (from home page)
 - Call to action
 - Map
 

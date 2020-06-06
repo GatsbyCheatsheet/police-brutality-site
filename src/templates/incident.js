@@ -28,15 +28,20 @@ export const query = graphql`
     pbIncident(id: { eq: $incidentId }) {
       id
       name
+      slug
       links
       date
-      city {
-        name
-      }
-      state {
-        name
-      }
       edit_at
+      state {
+        id
+        name
+        slug
+      }
+      city {
+        id
+        name
+        slug
+      }
     }
   }
 `
