@@ -6,6 +6,10 @@
 - Incidents by state
 - Incidents by city
 - Individual incident page
+- Filter all by city, state, tag, etc
+- Updates after data is improved:
+  - Use supplied id (once it is supplied)
+  - Tags; tag pages
 
 ## Data
 
