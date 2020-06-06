@@ -1,16 +1,21 @@
 import React from "react"
-import { Link } from "gatsby"
+import { Link, graphql } from "gatsby"
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
+import SelectCity from "../components/select-city"
+import SelectState from "../components/select-state"
 
 const IndexPage = ({ data: { allPbIncident } }) => (
   <Layout>
     <SEO title="Home" />
-    <p>TODO</p>
+    <p>
+      By city: <SelectCity />
+      &nbsp;&nbsp; By state: <SelectState />
+    </p>
     {allPbIncident.edges.map(({ node }) => (
       <li key={node.id}>
-        <Link to={`/incident/${node.id}`} title={node.name}>
+        <Link to={`/incident/${node.slug}`} title={node.name}>
           {node.name}
         </Link>
       </li>
@@ -27,6 +32,7 @@ export const query = graphql`
         node {
           id
           name
+          slug
           links
           date
           date_text

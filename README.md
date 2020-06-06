@@ -2,6 +2,7 @@
 
 ## TODO
 
+- link Incident to City and State
 - Embeds
   - Twitter
   - Youtube
@@ -15,6 +16,9 @@
 - Incidents by city
 - Individual incident page
 - Quick jump select to city or state (from home page)
+- Call to action
+- Map
+
 - Updates after data is improved:
   - Use supplied id (once it is supplied)
   - Tags; tag pages

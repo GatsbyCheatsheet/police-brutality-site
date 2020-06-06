@@ -8,8 +8,6 @@ const _ = require(`lodash`)
 const path = require(`path`)
 const slugify = require(`@sindresorhus/slugify`)
 
-const pbTypeName = `PbIncident`
-
 // Source 2020PB json into PbIncident nodes
 exports.onCreateNode = async function onCreateNode({
   node,
@@ -39,24 +37,89 @@ exports.onCreateNode = async function onCreateNode({
     const { data } = parsedContent
 
     if (_.isArray(data) && data[0] && data[0].links) {
-      data.forEach((obj, i) => {
-        // TODO use incoming incident id
-        const id = obj.id
-          ? String(obj.id)
+      data.forEach((incident, i) => {
+        // TODO FUTURE use incoming incident id once available
+        const id = incident.id
+          ? String(incident.id)
           : createNodeId(`${node.id} [${i}] >>> JSON`)
 
-        const jsonNode = {
-          ...obj,
+        incident.slug = id
+
+        const incidentNode = {
+          ...incident,
           id,
           children: [],
           parent: node.id,
           internal: {
-            contentDigest: createContentDigest(obj),
-            type: pbTypeName,
+            contentDigest: createContentDigest(incident),
+            type: `PbIncident`,
           },
         }
-        createNode(jsonNode)
-        createParentChildLink({ parent: node, child: jsonNode })
+        createNode(incidentNode)
+        createParentChildLink({ parent: node, child: incidentNode })
+      })
+
+      // TODO need to link City/State nodes to incident nodes
+
+      const cityStates = data.reduce((acc, { state, city }) => {
+        if (!state) {
+          return acc
+        }
+
+        if (!acc[state]) {
+          acc[state] = new Set()
+        }
+
+        if (city) {
+          acc[state].add(city)
+        }
+
+        return acc
+      }, {})
+
+      Object.entries(cityStates).forEach(([state, cities]) => {
+        if (state) {
+          const stateSlug = slugify(state)
+          const stateObj = {
+            name: state,
+            slug: stateSlug,
+          }
+
+          const stateNode = {
+            ...stateObj,
+            id: stateSlug,
+            children: [],
+            parent: null,
+            internal: {
+              contentDigest: createContentDigest(stateObj),
+              type: `State`,
+            },
+          }
+          createNode(stateNode)
+
+          cities.forEach(city => {
+            if (city) {
+              const citySlug = slugify(city)
+              const cityObj = {
+                name: city,
+                slug: citySlug,
+              }
+              const cityNodeId = `${citySlug}-${stateSlug}`
+              const cityNode = {
+                ...cityObj,
+                id: cityNodeId,
+                children: [],
+                parent: stateNode.id,
+                internal: {
+                  contentDigest: createContentDigest(cityObj),
+                  type: `City`,
+                },
+              }
+              createNode(cityNode)
+              createParentChildLink({ parent: stateNode, child: cityNode })
+            }
+          })
+        }
       })
     } else {
       throw new Error(`Bad 2020PB JSON`)
@@ -72,19 +135,34 @@ exports.createPages = async function createPages({ graphql, actions }) {
   const stateTemplate = path.resolve(`src/templates/state.js`)
   const cityTemplate = path.resolve(`src/templates/city.js`)
 
-  const incidentResults = await graphql(`
+  const results = await graphql(`
     {
       allPbIncident {
         edges {
           node {
             id
-            name
-            links
-            date
-            date_text
-            city
-            state
-            edit_at
+            slug
+          }
+        }
+      }
+      allState {
+        edges {
+          node {
+            id
+            slug
+          }
+        }
+      }
+      allCity {
+        edges {
+          node {
+            id
+            slug
+            parent {
+              ... on State {
+                slug
+              }
+            }
           }
         }
       }
@@ -92,67 +170,41 @@ exports.createPages = async function createPages({ graphql, actions }) {
   `)
 
   // Handle errors
-  if (incidentResults.errors) {
+  if (results.errors) {
     reporter.panicOnBuild(`Error while running GraphQL query.`)
     return
   }
 
   // Create individual incident pages
-  incidentResults.data.allPbIncident.edges.forEach(({ node }) => {
+  results.data.allPbIncident.edges.forEach(({ node }) => {
     createPage({
-      path: `/incident/${node.id}`,
+      path: `/incident/${node.slug}`,
       component: incidentTemplate,
       context: {
-        id: node.id, // use node id for now
+        incidentId: node.id, // use node id for now
       },
     })
   })
 
-  // Group cities by state
-  // NOTE should always account for multiple cities with same name (e.g. Kansas City)
-  const cityStates = incidentResults.data.allPbIncident.edges.reduce(
-    (acc, { node: { state, city } }) => {
-      if (!state) {
-        return acc
-      }
-
-      if (!acc[state]) {
-        acc[state] = new Set()
-      }
-
-      if (city) {
-        acc[state].add(city)
-      }
-
-      return acc
-    },
-    {}
-  )
-
-  Object.entries(cityStates).forEach(([state, cities]) => {
-    const stateSlug = slugify(state)
-    const statePath = `/${stateSlug}`
-
-    // Create state page
+  // Create state pages
+  results.data.allState.edges.forEach(({ node }) => {
     createPage({
-      path: statePath,
+      path: `/${node.slug}`,
       component: stateTemplate,
       context: {
-        state,
-        cities: [...cities], // set => array
+        stateId: node.id,
       },
     })
+  })
 
-    // Create city pages
-    cities.forEach(city => {
-      createPage({
-        path: `${statePath}/${slugify(city)}`,
-        component: cityTemplate,
-        context: {
-          state: state,
-          city: city,
-        },
-      })
+  // Create city pages
+  results.data.allCity.edges.forEach(({ node }) => {
+    createPage({
+      path: `/${node.parent.slug}/${node.slug}`,
+      component: cityTemplate,
+      context: {
+        cityId: node.id,
+      },
     })
   })
 }

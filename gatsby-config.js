@@ -38,7 +38,12 @@ module.exports = {
         icon: `src/images/2020pblogo.png`, // This path is relative to the root of the site.
       },
     },
-    `gatsby-plugin-sass`,
+    {
+      resolve: `gatsby-plugin-sass`,
+      options: {
+        includePaths: ["node_modules/systematize"],
+      },
+    },
     `gatsby-plugin-react-helmet`,
     `gatsby-plugin-sitemap`, // (siteMetadata.siteURL required)
     {

@@ -4,15 +4,8 @@ import { graphql } from "gatsby"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 
-// TODO
-
-const StateTemplate = ({ pageContext, data: { allPbIncident } }) => {
-  const {
-    state,
-    // TODO cities
-  } = pageContext
-
-  const title = `Incidents in ${state}`
+const StateTemplate = ({ data: { state, allPbIncident } }) => {
+  const title = `Incidents in ${state.name}`
 
   return (
     <Layout>
@@ -27,16 +20,18 @@ const StateTemplate = ({ pageContext, data: { allPbIncident } }) => {
 
 export default StateTemplate
 
+// TODO use ($stateId: String!) in allPbIncident
 export const query = graphql`
-  query($state: String!) {
-    allPbIncident(
-      filter: { state: { eq: $state } }
-      sort: { fields: date, order: DESC }
-    ) {
+  query($stateId: String!) {
+    state(id: { eq: $stateId }) {
+      name
+    }
+    allPbIncident(sort: { fields: date, order: DESC }) {
       edges {
         node {
           id
           name
+          slug
           links
           date
           date_text
