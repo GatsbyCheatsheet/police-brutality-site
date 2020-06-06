@@ -1,4 +1,4 @@
-const IMMUTABLE_CACHING_HEADER = `Cache-Control: public, max-age=31536000, immutable`
+// const IMMUTABLE_CACHING_HEADER = `Cache-Control: public, max-age=31536000, immutable`
 
 module.exports = {
   siteMetadata: {
@@ -14,6 +14,13 @@ module.exports = {
       options: {
         name: `images`,
         path: `${__dirname}/src/images`,
+      },
+    },
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        name: `2020pb`,
+        path: `${__dirname}/data/2020pb`,
       },
     },
     `gatsby-transformer-sharp`,
