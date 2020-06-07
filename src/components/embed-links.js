@@ -1,10 +1,10 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Tweet } from "react-twitter-widgets"
+import InstagramEmbed from "react-instagram-embed"
 import ExternalLinkButton from "./external-link-button"
 
 // TODO renderers:
 // - Youtube
-// - Reddit
 // - Streamable
 // - Gfycat
 // - Imgur (+ gallery)
@@ -14,7 +14,41 @@ const linkName = link => {
   return url.hostname.replace(/^www\./i, "")
 }
 
-const twitterTweetUrlRegex = /twitter\.com\/([A-Za-z0-9_]+)\/status\/(\d+)/
+const twitterTweetUrlRegex = /\/\/(www\.)?twitter\.com\/([A-Za-z0-9_]+)\/status\/(\d+)/
+
+const instagramUrlRegex = /(\/\/(?:www\.)?(instagram\.com|instagr.am)\/p\/([^/?#&]+)).*/
+
+// Currently, embed works with both old and new reddit links
+const redditPostUrlRegex = /\/\/((www\.)|(old\.))?reddit\.com\/r\/(\w+)\/comments\/([a-z0-9]{2,10})/
+
+const RedditPost = ({ link }) => {
+  // Ensure component returns null when link changes,
+  // allowing reddit js to catch up
+  const [resetting, setResetting] = useState(true)
+  useEffect(() => {
+    setResetting(true)
+    const timer = setTimeout(() => {
+      setResetting(false)
+    }, 100)
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [link])
+
+  return resetting ? null : (
+    <div>
+      <ExternalLinkButton href={link}>Reddit Permalink</ExternalLinkButton>
+      <div>
+        <blockquote
+          className="reddit-card"
+          data-card-created={Math.floor(Date.now() / 1000)}
+        >
+          <a href={link}>Loading Reddit Post...</a>
+        </blockquote>
+      </div>
+    </div>
+  )
+}
 
 const EmbedLink = ({ link }) => {
   // const ln = linkName(link)
@@ -22,8 +56,26 @@ const EmbedLink = ({ link }) => {
   if (twitterTweetUrlRegex.test(link)) {
     const tweetId = link.match(twitterTweetUrlRegex)[2]
     if (tweetId) {
-      return <Tweet tweetId={tweetId} />
+      return (
+        <Tweet
+          tweetId={tweetId}
+          renderError={_err => (
+            <>
+              <p>Could not embed Tweet.</p>
+              <p>
+                <ExternalLinkButton href={link}>
+                  View on Twitter
+                </ExternalLinkButton>
+              </p>
+            </>
+          )}
+        />
+      )
     }
+  } else if (redditPostUrlRegex.test(link)) {
+    return <RedditPost link={link} />
+  } else if (instagramUrlRegex.test(link)) {
+    return <InstagramEmbed url={link} injectScript={false} />
   }
 
   return <ExternalLinkButton href={link} />

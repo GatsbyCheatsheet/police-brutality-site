@@ -18,6 +18,14 @@ const AboutPage = () => (
       enforcement across the country so that the media and others may have a
       repository documenting these historic events.
     </p>
+    <h3>Victim Resources</h3>
+    <p>Resources for contacting pro bono attorneys:</p>
+    <ExternalLinkButton href="https://docs.google.com/document/d/1X4-YS3vFn5CLL9QtJSU0xqmTh_h8XilXgOqGAjZISBI/mobilebasic">
+      Google Doc
+    </ExternalLinkButton>{" "}
+    <ExternalLinkButton href="https://twitter.com/ashtroid22/status/1267162049248976898">
+      Twitter Source
+    </ExternalLinkButton>
     <h3>Contribute</h3>
     <p>
       Contributions can be made on{" "}
@@ -48,7 +56,7 @@ const AboutPage = () => (
     </p>
     <h3>Website</h3>
     <p>
-      This website is a front-end for the data compiled at the{" "}
+      This website is a front end for the data compiled at the{" "}
       <ExternalLinkButton
         href="https://github.com/2020PB/police-brutality"
         title="2020PB/police-brutality on GitHub"
@@ -57,6 +65,17 @@ const AboutPage = () => (
         2020PB/police-brutality
       </ExternalLinkButton>{" "}
       project.
+    </p>
+    <p>
+      The source code for the{" "}
+      <ExternalLinkButton
+        href="https://github.com/andrewsuzuki/police-brutality-site"
+        title="police-brutality-site on GitHub"
+        isButton={false}
+      >
+        front end
+      </ExternalLinkButton>{" "}
+      is available for contributions as well.
     </p>
   </Layout>
 )

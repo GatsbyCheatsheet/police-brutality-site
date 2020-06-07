@@ -9,6 +9,7 @@ const path = require(`path`)
 const slugify = require(`@sindresorhus/slugify`)
 
 const expectedIncomingIncidentFields = [
+  "id",
   "name",
   "links",
   "date",
@@ -168,7 +169,7 @@ exports.onCreateNode = async function onCreateNode({
 
       // Create Incident nodes
       let warnedUnexpectedKeys = false
-      data.forEach((incomingIncident, i) => {
+      data.forEach(incomingIncident => {
         // Check for unexpected (possibly new) incoming keys
         if (!warnedUnexpectedKeys) {
           const diff = _.difference(
@@ -196,7 +197,8 @@ exports.onCreateNode = async function onCreateNode({
 
         // Ensure has name
         if (typeof incident.name !== "string" || incident.name.length === 0) {
-          reporter.warn("Incident missing string name")
+          reporter.warn("Incident missing string name; skipping")
+          console.log(incomingIncident)
           return // continue
         }
 
@@ -212,10 +214,12 @@ exports.onCreateNode = async function onCreateNode({
           incident.edit_at = null
         }
 
-        // TODO FUTURE use incoming incident id once available
-        const id = createNodeId(
-          `${incident.name}${incident.date}${incident.city}${incident.state}`
-        )
+        // Use incoming incident id if available
+        const id =
+          incident.id ||
+          createNodeId(
+            `${incident.name}${incident.date}${incident.city}${incident.state}`
+          )
 
         incident.slug = id
 

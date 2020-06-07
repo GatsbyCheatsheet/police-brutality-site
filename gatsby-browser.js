@@ -4,4 +4,7 @@
  * See: https://www.gatsbyjs.org/docs/browser-apis/
  */
 
-// You can delete this file if you're not using it
+const loadjs = require(`loadjs`)
+
+loadjs(`https://embed.redditmedia.com/widgets/platform.js`, `reddit-widgets`)
+loadjs(`https://platform.instagram.com/en_US/embeds.js`, `instagram-embeds`)

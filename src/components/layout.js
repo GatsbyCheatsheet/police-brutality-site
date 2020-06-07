@@ -1,6 +1,6 @@
 import React from "react"
 import PropTypes from "prop-types"
-import { useStaticQuery, graphql } from "gatsby"
+import { useStaticQuery, graphql, Link } from "gatsby"
 
 import Header from "./header"
 import "../styles/layout.scss"
@@ -34,6 +34,10 @@ const Layout = ({ children }) => {
           <div className="container">
             <div className="has-text-centered">
               © {new Date().getFullYear()} &middot;{" "}
+              <Link to="/about" title="About">
+                About
+              </Link>{" "}
+              &middot;{" "}
               <a
                 href={data.site.siteMetadata.sourceUrl}
                 title="Source code on GitHub"

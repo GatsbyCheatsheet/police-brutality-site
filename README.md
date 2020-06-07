@@ -8,7 +8,6 @@
 - Map
 
 - Updates after data is improved:
-  - Use supplied id (once it is supplied)
   - Descriptions (from .md files)
   - Tags; tag pages
 
