@@ -2,8 +2,8 @@ module.exports = {
   siteMetadata: {
     title: `2020 Police Brutality`,
     description: `Documenting evidence of police brutality during the 2020 George Floyd protests`,
-    author: `Andrew Suzuki`,
-    siteUrl: `https://blah`, // TODO
+    author: `2020PB`,
+    siteUrl: `https://policebrutality.netlify.app`,
     sourceUrl: `https://github.com/andrewsuzuki/police-brutality-site`,
   },
   plugins: [

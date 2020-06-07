@@ -1,10 +1,17 @@
 import React from "react"
+import { graphql } from "gatsby"
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import ExternalLinkButton from "../components/external-link-button"
 
-const AboutPage = () => (
+const AboutPage = ({
+  data: {
+    site: {
+      siteMetadata: { sourceUrl },
+    },
+  },
+}) => (
   <Layout>
     <SEO title="About" />
     <h2>About</h2>
@@ -69,7 +76,7 @@ const AboutPage = () => (
     <p>
       The source code for the{" "}
       <ExternalLinkButton
-        href="https://github.com/andrewsuzuki/police-brutality-site"
+        href={sourceUrl}
         title="police-brutality-site on GitHub"
         isButton={false}
       >
@@ -81,3 +88,13 @@ const AboutPage = () => (
 )
 
 export default AboutPage
+
+export const query = graphql`
+  query {
+    site {
+      siteMetadata {
+        sourceUrl
+      }
+    }
+  }
+`

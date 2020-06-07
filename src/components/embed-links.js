@@ -79,7 +79,6 @@ const EmbedLink = ({ link }) => {
   } else if (youtubeUrlRegex.test(link)) {
     const videoId = link.match(youtubeUrlRegex)[3]
     if (videoId) {
-      console.log(videoId)
       return (
         <>
           <YouTube videoId={videoId} />
