@@ -2,28 +2,48 @@
 
 // Override variables
 
+$widescreen-enabled: false; // original: true
+$fullhd-enabled: false; // original: true
 $navbar-breakpoint: $tablet; // original: $desktop
-$section-padding: 0 1.5rem; // original: 3rem 1.5rem
+// $section-padding: 0 1.5rem; // original: 3rem 1.5rem
 
 @import "../../node_modules/bulma/bulma.sass";
 
 // Layout
 
+@mixin below-desktop-padding {
+  @include until($desktop) {
+    padding-left: $gap;
+    padding-right: $gap;
+  }
+}
+
 .site {
   display: flex;
   min-height: 100vh;
   flex-direction: column;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .site-header {
+  @include below-desktop-padding;
   background: $dark;
-  padding: 2rem 1.5rem;
+  padding: 2rem 0;
   margin-bottom: 2rem;
 
+  .navbar-brand {
+    align-items: center; // original: stretch
+  }
+
   .site-title {
-    font-size: 1.5em;
+    font-size: $size-4;
     font-weight: bold;
     margin: 0;
+
+    @include until(450px) {
+      font-size: $size-5;
+    }
 
     a {
       text-decoration: none;
@@ -34,6 +54,8 @@ $section-padding: 0 1.5rem; // original: 3rem 1.5rem
 
 .content {
   .main {
+    @include below-desktop-padding;
+
     :first-child {
       margin-top: 0;
     }
@@ -46,6 +68,7 @@ $section-padding: 0 1.5rem; // original: 3rem 1.5rem
 }
 
 .footer {
+  @include below-desktop-padding;
   margin-top: 2rem;
   padding: 2rem 0;
 }

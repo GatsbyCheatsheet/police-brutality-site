@@ -22,14 +22,14 @@ const Layout = ({ children }) => {
       <section>
         <Header siteTitle={data.site.siteMetadata.title} />
       </section>
-      <section className="section" style={{ flex: 1 }}>
+      <section style={{ flex: 1 }}>
         <div className="content">
           <div className="container">
             <main className="main">{children}</main>
           </div>
         </div>
       </section>
-      <section className="section">
+      <section>
         <footer className="footer">
           <div className="container">
             <div className="has-text-centered">
