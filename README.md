@@ -29,7 +29,7 @@ Also creates `State` and `City` nodes.
 
 ## TODO
 
-- Primitive pagination
+- Pagination
 - Call to action
 - Map
 - Updates after data is improved:

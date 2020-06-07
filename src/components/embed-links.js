@@ -4,12 +4,7 @@ import InstagramEmbed from "react-instagram-embed"
 import YouTube from "react-youtube"
 import ExternalLinkButton from "./external-link-button"
 
-const linkName = link => {
-  const url = new URL(link)
-  return url.hostname.replace(/^www\./i, "")
-}
-
-const twitterTweetUrlRegex = /\/\/(www\.)?twitter\.com\/([A-Za-z0-9_]+)\/status\/(\d+)/
+const twitterTweetUrlRegex = /\/\/(www\.|mobile\.)?twitter\.com\/([A-Za-z0-9_]+)\/status\/(\d+)/
 
 const instagramUrlRegex = /(\/\/(?:www\.)?(instagram\.com|instagr.am)\/p\/([^/?#&]+)).*/
 
@@ -18,6 +13,32 @@ const instagramUrlRegex = /(\/\/(?:www\.)?(instagram\.com|instagr.am)\/p\/([^/?#
 const redditPostUrlRegex = /\/\/((www\.)|(old\.))?reddit\.com\/r\/(\w+)\/comments\/([a-z0-9]{2,10})(\/?$|\/\w+\/?$)/
 
 const youtubeUrlRegex = /\/\/(www\.)?(youtube\.com\/watch\?.*v=|youtube\.com\/embed\/|youtu\.be\/)([A-Za-z0-9_-]{11})(.*)?/
+
+const googleMapsUrlRegex = /\/\/(www\.)?google\.(com|ca)\/maps\//
+
+const hostDisplayName = {
+  "reddit.com": "Reddit",
+  "old.reddit.com": "Reddit",
+  "i.redd.it": "Reddit Image",
+  "v.redd.it": "Reddit Video",
+  "twitter.com": "Twitter",
+  "mobile.twitter.com": "Twitter",
+  "dailymail.co.uk": "Daily Mail",
+  "instagram.com": "Instagram",
+  "youtube.com": "YouTube",
+  "youtu.be": "YouTube",
+  "streamable.com": "Streamable",
+  "tiktok.com": "TikTok",
+  "facebook.com": "Facebook",
+}
+const linkName = link => {
+  const url = new URL(link)
+  const host = url.hostname.replace(/^www\./, "")
+  if (host === "google.com" && googleMapsUrlRegex.test(link)) {
+    return "Google Maps"
+  }
+  return hostDisplayName[host] || host
+}
 
 const RedditPost = ({ link }) => {
   // Ensure component returns null when link changes,
@@ -88,13 +109,22 @@ const EmbedLink = ({ link }) => {
         </>
       )
     }
+  } else if (googleMapsUrlRegex.test(link)) {
+    return (
+      <ExternalLinkButton href={link}>
+        Location on Google Maps
+      </ExternalLinkButton>
+    )
   }
 
+  // Default
   return <ExternalLinkButton href={link} />
 }
 
 const EmbedLinks = ({ links }) => {
   const [currentLink, setCurrentLink] = useState(links[0])
+
+  const linkNameCounts = {}
 
   return (
     <div className="embed-links">
@@ -106,6 +136,11 @@ const EmbedLinks = ({ links }) => {
             <ul>
               {links.map(link => {
                 const handler = () => setCurrentLink(link)
+
+                const name = linkName(link)
+                const nameCount = (linkNameCounts[name] || 0) + 1
+                linkNameCounts[name] = nameCount
+
                 /* eslint-disable jsx-a11y/anchor-is-valid */
                 return (
                   <li
@@ -118,7 +153,13 @@ const EmbedLinks = ({ links }) => {
                       role="button"
                       tabIndex="0"
                     >
-                      {linkName(link)}
+                      {name}
+                      {nameCount > 1 ? (
+                        <>
+                          &nbsp;
+                          <span className="has-text-grey">({nameCount})</span>
+                        </>
+                      ) : null}
                     </a>
                   </li>
                 )
