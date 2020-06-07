@@ -6,10 +6,14 @@ import SEO from "../components/seo"
 import SelectCity from "../components/select-city"
 import SelectState from "../components/select-state"
 import IncidentListing from "../components/incident-listing"
+import { Blurb } from "./about"
 
 const IndexPage = ({ data: { allPbIncident } }) => (
   <Layout>
     <SEO title="Home" />
+    <div className="false-hero">
+      <Blurb />
+    </div>
     <h2>Latest Incidents</h2>
     <div className="level">
       <div className="level-left">

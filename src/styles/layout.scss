@@ -5,7 +5,6 @@
 $widescreen-enabled: false; // original: true
 $fullhd-enabled: false; // original: true
 $navbar-breakpoint: $tablet; // original: $desktop
-// $section-padding: 0 1.5rem; // original: 3rem 1.5rem
 
 @import "../../node_modules/bulma/bulma.sass";
 
@@ -55,10 +54,6 @@ $navbar-breakpoint: $tablet; // original: $desktop
 .content {
   .main {
     @include below-desktop-padding;
-
-    :first-child {
-      margin-top: 0;
-    }
   }
 
   // Fix
@@ -86,9 +81,6 @@ $navbar-breakpoint: $tablet; // original: $desktop
     margin: 0;
     font-weight: normal;
   }
-
-  // &-meta {
-  // }
 }
 
 .embed-links {
@@ -100,4 +92,9 @@ $navbar-breakpoint: $tablet; // original: $desktop
 // reddit embed iframe wrapper
 .embedly-card-hug {
   margin: 0 !important;
+}
+
+.false-hero {
+  font-size: $size-5;
+  margin: 1em 0;
 }

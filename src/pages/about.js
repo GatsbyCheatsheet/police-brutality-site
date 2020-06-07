@@ -5,16 +5,8 @@ import Layout from "../components/layout"
 import SEO from "../components/seo"
 import ExternalLinkButton from "../components/external-link-button"
 
-const AboutPage = ({
-  data: {
-    site: {
-      siteMetadata: { sourceUrl },
-    },
-  },
-}) => (
-  <Layout>
-    <SEO title="About" />
-    <h2>About</h2>
+export const Blurb = _props => (
+  <>
     <p>
       Law enforcement officers across the nation have been brutalizing peaceful
       protesters and rapidly escalating tensions in response to unrest over the
@@ -25,6 +17,20 @@ const AboutPage = ({
       enforcement across the country so that the media and others may have a
       repository documenting these historic events.
     </p>
+  </>
+)
+
+const AboutPage = ({
+  data: {
+    site: {
+      siteMetadata: { sourceUrl },
+    },
+  },
+}) => (
+  <Layout>
+    <SEO title="About" />
+    <h2>About</h2>
+    <Blurb />
     <h3>Victim Resources</h3>
     <p>Resources for contacting pro bono attorneys:</p>
     <ExternalLinkButton href="https://docs.google.com/document/d/1X4-YS3vFn5CLL9QtJSU0xqmTh_h8XilXgOqGAjZISBI/mobilebasic">
