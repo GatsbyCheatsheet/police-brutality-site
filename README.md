@@ -1,5 +1,32 @@
 # police-brutality-site
 
+## Develop
+
+```
+npm install
+npm run develop
+```
+
+## Data
+
+Dataset: https://github.com/2020PB/police-brutality
+
+Converted into `PbIncident` GraphQL nodes with these fields:
+```
+id: String!
+name: String!
+slug: String!
+links: [String!]!
+date: Date @dateformat(formatString: "YYYY-MM-DD")
+edit_at: String
+state_id: String!
+state: State! @link(by: "id", from: "state_id")
+city_id: String
+city: City @link(by: "id", from: "city_id")
+```
+
+Also creates `State` and `City` nodes.
+
 ## TODO
 
 - Primitive pagination
@@ -13,18 +40,3 @@
     - Streamable (5x links as of 2020-06-06)
     - Gfycat (2x links of 2020-06-06)
     - Imgur (2x links as of 2020-06-06)
-
-## Data
-
-Dataset: https://github.com/2020PB/police-brutality
-
-Converted into `PbIncident` GraphQL nodes.
-
-Fields:
-- id (internal)
-- name
-- links ([String])
-- date
-- city (City)
-- state (State)
-- edit_at
