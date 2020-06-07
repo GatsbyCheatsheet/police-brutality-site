@@ -81,6 +81,10 @@ $navbar-breakpoint: $tablet; // original: $desktop
     margin: 0;
     font-weight: normal;
   }
+
+  .incident-meta {
+    margin-bottom: 0 !important;
+  }
 }
 
 .embed-links {

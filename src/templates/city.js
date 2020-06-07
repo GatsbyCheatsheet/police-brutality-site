@@ -1,5 +1,5 @@
 import React from "react"
-import { graphql } from "gatsby"
+import { graphql, Link } from "gatsby"
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
@@ -7,12 +7,22 @@ import IncidentListing from "../components/incident-listing"
 import { formatLocation } from "../utils"
 
 const CityTemplate = ({ data: { city, allPbIncident } }) => {
-  const title = `Incidents in ${formatLocation(city, city.state)}`
+  const { state } = city
+  const title = `Incidents in ${formatLocation(city, state)}`
 
   return (
     <Layout>
       <SEO title={title} />
       <h2>{title}</h2>
+      <p>
+        <Link
+          to={`/${state.slug}`}
+          title={`All incidents in ${state.name}`}
+          className="button is-small is-light"
+        >
+          &#129121; See all incidents in {state.name}
+        </Link>
+      </p>
       {allPbIncident.edges.map(({ node }) => (
         <IncidentListing incident={node} key={node.id} />
       ))}
@@ -28,6 +38,7 @@ export const query = graphql`
       name
       state {
         name
+        slug
       }
     }
     allPbIncident(
