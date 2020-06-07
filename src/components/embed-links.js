@@ -1,13 +1,8 @@
 import React, { useState, useEffect } from "react"
 import { Tweet } from "react-twitter-widgets"
 import InstagramEmbed from "react-instagram-embed"
+import YouTube from "react-youtube"
 import ExternalLinkButton from "./external-link-button"
-
-// TODO renderers:
-// - Youtube
-// - Streamable
-// - Gfycat
-// - Imgur (+ gallery)
 
 const linkName = link => {
   const url = new URL(link)
@@ -19,7 +14,10 @@ const twitterTweetUrlRegex = /\/\/(www\.)?twitter\.com\/([A-Za-z0-9_]+)\/status\
 const instagramUrlRegex = /(\/\/(?:www\.)?(instagram\.com|instagr.am)\/p\/([^/?#&]+)).*/
 
 // Currently, embed works with both old and new reddit links
-const redditPostUrlRegex = /\/\/((www\.)|(old\.))?reddit\.com\/r\/(\w+)\/comments\/([a-z0-9]{2,10})/
+// Ensures it isn't a comment link (no code after title slug part)
+const redditPostUrlRegex = /\/\/((www\.)|(old\.))?reddit\.com\/r\/(\w+)\/comments\/([a-z0-9]{2,10})(\/?$|\/\w+\/?$)/
+
+const youtubeUrlRegex = /\/\/(www\.)?(youtube\.com\/watch\?.*v=|youtube\.com\/embed\/|youtu\.be\/)([A-Za-z0-9_-]{11})(.*)?/
 
 const RedditPost = ({ link }) => {
   // Ensure component returns null when link changes,
@@ -37,7 +35,6 @@ const RedditPost = ({ link }) => {
 
   return resetting ? null : (
     <div>
-      <ExternalLinkButton href={link}>Reddit Permalink</ExternalLinkButton>
       <div>
         <blockquote
           className="reddit-card"
@@ -46,6 +43,9 @@ const RedditPost = ({ link }) => {
           <a href={link}>Loading Reddit Post...</a>
         </blockquote>
       </div>
+      <p>
+        <ExternalLinkButton href={link}>Reddit Permalink</ExternalLinkButton>
+      </p>
     </div>
   )
 }
@@ -54,7 +54,7 @@ const EmbedLink = ({ link }) => {
   // const ln = linkName(link)
 
   if (twitterTweetUrlRegex.test(link)) {
-    const tweetId = link.match(twitterTweetUrlRegex)[2]
+    const tweetId = link.match(twitterTweetUrlRegex)[3]
     if (tweetId) {
       return (
         <Tweet
@@ -76,6 +76,19 @@ const EmbedLink = ({ link }) => {
     return <RedditPost link={link} />
   } else if (instagramUrlRegex.test(link)) {
     return <InstagramEmbed url={link} injectScript={false} />
+  } else if (youtubeUrlRegex.test(link)) {
+    const videoId = link.match(youtubeUrlRegex)[3]
+    if (videoId) {
+      console.log(videoId)
+      return (
+        <>
+          <YouTube videoId={videoId} />
+          <p>
+            <ExternalLinkButton href={link}>View on YouTube</ExternalLinkButton>
+          </p>
+        </>
+      )
+    }
   }
 
   return <ExternalLinkButton href={link} />
@@ -89,7 +102,7 @@ const EmbedLinks = ({ links }) => {
       <div className="embed-links-tabs">
         {links.length === 0 ? (
           "No links available"
-        ) : links.length === 1 ? null : (
+        ) : (
           <div className="tabs">
             <ul>
               {links.map(link => {

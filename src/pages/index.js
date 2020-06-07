@@ -32,9 +32,7 @@ const IndexPage = ({ data: { allPbIncident } }) => (
 
 export default IndexPage
 
-// TODO pagination
-
-// NOTE doesn't include null-date incidents
+// NOTE doesn't include incidents with null dates
 export const query = graphql`
   query {
     allPbIncident(

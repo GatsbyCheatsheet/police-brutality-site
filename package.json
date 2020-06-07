@@ -28,7 +28,8 @@
     "react-dom": "^16.12.0",
     "react-helmet": "^6.0.0",
     "react-instagram-embed": "^1.5.0",
-    "react-twitter-widgets": "^1.9.5"
+    "react-twitter-widgets": "^1.9.5",
+    "react-youtube": "^7.11.2"
   },
   "devDependencies": {
     "prettier": "2.0.5"

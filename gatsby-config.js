@@ -1,5 +1,3 @@
-// const IMMUTABLE_CACHING_HEADER = `Cache-Control: public, max-age=31536000, immutable`
-
 module.exports = {
   siteMetadata: {
     title: `2020 Police Brutality`,
@@ -56,12 +54,7 @@ module.exports = {
     {
       resolve: `gatsby-plugin-netlify`,
       options: {
-        headers: {
-          // TODO
-          // "/:blah.js": [IMMUTABLE_CACHING_HEADER],
-          // "/styles.:blah.css": [IMMUTABLE_CACHING_HEADER],
-          // "/favicon-:blah.png?v=*": [IMMUTABLE_CACHING_HEADER],
-        },
+        headers: {},
       },
     },
   ],
