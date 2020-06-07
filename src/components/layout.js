@@ -19,7 +19,7 @@ const Layout = ({ children }) => {
 
   return (
     <div className="site">
-      <section className="section">
+      <section>
         <Header siteTitle={data.site.siteMetadata.title} />
       </section>
       <section className="section" style={{ flex: 1 }}>

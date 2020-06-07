@@ -2,15 +2,14 @@
 
 ## TODO
 
-- Embeds
-- All incidents (ordered by most recent desc)
-  - Primitive Pagination
-- Individual incident page
+- More embeds
+- Primitive pagination
 - Call to action
 - Map
 
 - Updates after data is improved:
   - Use supplied id (once it is supplied)
+  - Descriptions (from .md files)
   - Tags; tag pages
 
 ## Data

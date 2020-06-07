@@ -15,16 +15,18 @@ $section-padding: 0 1.5rem; // original: 3rem 1.5rem
 }
 
 .site-header {
-  padding: 2rem 0;
+  background: $dark;
+  padding: 2rem 1.5rem;
+  margin-bottom: 2rem;
 
   .site-title {
-    font-size: 2em;
+    font-size: 1.5em;
     font-weight: bold;
     margin: 0;
 
     a {
       text-decoration: none;
-      color: $text-strong;
+      color: $dark-invert;
     }
   }
 }

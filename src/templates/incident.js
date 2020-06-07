@@ -3,20 +3,19 @@ import { graphql } from "gatsby"
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
-import { formatDate } from "../utils"
+import IncidentMeta from "../components/incident-meta"
+import EmbedLinks from "../components/embed-links"
 
 const IncidentTemplate = ({ data: { pbIncident } }) => {
-  const { name, date, city, state } = pbIncident
+  const { name, links } = pbIncident
   const title = `Incident: ${name}`
 
   return (
     <Layout>
       <SEO title={title} />
       <h2>{title}</h2>
-      <p>Date: {formatDate(date)}</p>
-      <p>
-        Location: {city && city.name}, {state && state.name}
-      </p>
+      <IncidentMeta incident={pbIncident} />
+      <EmbedLinks links={links} />
     </Layout>
   )
 }

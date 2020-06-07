@@ -1,24 +1,24 @@
 import React from "react"
 import { Link } from "gatsby"
-import { formatDate, formatLocation } from "../utils"
 import EmbedLinks from "./embed-links"
+import IncidentMeta from "./incident-meta"
 
-const IncidentListing = ({
-  incident: { slug, name, date, links, city, state },
-}) => (
-  <div className="incident-listing">
-    <div className="box">
-      <h3 className="incident-listing-title">
-        <Link to={`/incident/${slug}`} title={name}>
-          {name}
-        </Link>
-      </h3>
-      <p className="incident-listing-meta">
-        {formatDate(date)} &middot; {formatLocation(city, state)}
-      </p>
-      <EmbedLinks links={links} />
+const IncidentListing = ({ incident }) => {
+  const { slug, name, links } = incident
+
+  return (
+    <div className="incident-listing">
+      <div className="box">
+        <h3 className="incident-listing-title">
+          <Link to={`/incident/${slug}`} title={name}>
+            {name}
+          </Link>
+        </h3>
+        <IncidentMeta incident={incident} />
+        <EmbedLinks links={links} />
+      </div>
     </div>
-  </div>
-)
+  )
+}
 
 export default IncidentListing

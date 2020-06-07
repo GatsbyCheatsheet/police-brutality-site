@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import { Tweet } from "react-twitter-widgets"
+import ExternalLinkButton from "./external-link-button"
 
 // TODO renderers:
 // - Youtube
@@ -25,11 +26,7 @@ const EmbedLink = ({ link }) => {
     }
   }
 
-  return (
-    <a href={link} className="button" target="_blank" rel="noopener noreferrer">
-      External Link&nbsp;&#x1F855;
-    </a>
-  )
+  return <ExternalLinkButton href={link} />
 }
 
 const EmbedLinks = ({ links }) => {
