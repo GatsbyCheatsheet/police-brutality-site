@@ -10,7 +10,7 @@ const instagramUrlRegex = /(\/\/(?:www\.)?(instagram\.com|instagr.am)\/p\/([^/?#
 
 // Currently, embed works with both old and new reddit links
 // Ensures it isn't a comment link (no code after title slug part)
-const redditPostUrlRegex = /\/\/((www\.)|(old\.))?reddit\.com\/r\/(\w+)\/comments\/([a-z0-9]{2,10})(\/?$|\/\w+\/?$)/
+const redditPostUrlRegex = /\/\/((www\.)|(old\.))?reddit\.com\/r\/(\w+)\/comments\/([a-z0-9]{2,10})(\/?$|\/\w+\/?(\?|$))/
 
 const youtubeUrlRegex = /\/\/(www\.)?(youtube\.com\/watch\?.*v=|youtube\.com\/embed\/|youtu\.be\/)([A-Za-z0-9_-]{11})(.*)?/
 
